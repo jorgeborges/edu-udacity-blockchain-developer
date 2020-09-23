@@ -181,9 +181,9 @@ class Blockchain {
         let self = this;
         return new Promise(async (resolve, reject) => {
             const stars = [];
-            const blocks = self.chain.slice(1, self.chain.length + 1);
+            const chain = self._getNoGenesisChain();
 
-            for (const block of blocks) {
+            for (const block of chain) {
                 const blockData = await block.getBData();
 
                 if (blockData && blockData.owner === address) {
@@ -204,21 +204,24 @@ class Blockchain {
     validateChain() {
         let self = this;
         return new Promise(async (resolve, reject) => {
-            const errorLog = self.chain
-                .slice(1, self.chain.length + 1)
-                .reduce(async (logAcc, block) => {
-                    const isBlockValid = await block.validate();
+            const errorLog = [];
+            const chain = self._getNoGenesisChain();
 
-                    if (!isBlockValid) {
-                        logAcc.push(`Block.height ${block.height} is not valid`);
-                        return stars;
-                    }
-                }, [])
+            for (const block of chain) {
+                const isBlockValid = await block.validate();
+
+                if (!isBlockValid) {
+                    errorLog.push(`Block.height ${block.height} is not valid`);
+                }
+            }
 
             resolve(errorLog);
         });
     }
 
+    _getNoGenesisChain() {
+        return this.chain.slice(1, this.chain.length + 1);
+    }
 }
 
 module.exports.Blockchain = Blockchain;
