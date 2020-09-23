@@ -64,7 +64,7 @@ class Blockchain {
     _addBlock(block) {
         let self = this;
         return new Promise(async (resolve, reject) => {
-            if (self.height > 0) {
+            if (self.height >= 0) {
                 const latestBlock = self.chain[self.chain.length - 1];
                 block.previousBlockHash = latestBlock.hash;
             }
@@ -114,7 +114,13 @@ class Blockchain {
             const messageTime = parseInt(message.split(':')[1]);
             const currentTime = parseInt(new Date().getTime().toString().slice(0, -3));
             const isTimeValid = (currentTime - messageTime) < 300;
-            const isMessageValid = bitcoinMessage.verify(message, address, signature);
+            let isMessageValid = true;
+
+            try {
+                isMessageValid = bitcoinMessage.verify(message, address, signature);
+            } catch (error) {
+                isMessageValid = false;
+            }
 
             if (isTimeValid && isMessageValid) {
                 const block = new BlockClass.Block({
@@ -123,9 +129,9 @@ class Blockchain {
                 });
                 self._addBlock(block);
                 resolve(block)
+            } else {
+                resolve(null);
             }
-
-            reject(Error('Could not add star'));
         });
     }
 
@@ -173,17 +179,17 @@ class Blockchain {
      */
     getStarsByWalletAddress(address) {
         let self = this;
-        return new Promise((resolve, reject) => {
-            const stars = self.chain
-                .slice(1, self.chain.length + 1)
-                .reduce(async (starsAcc, block) => {
-                    const blockData = await block.getBData();
+        return new Promise(async (resolve, reject) => {
+            const stars = [];
+            const blocks = self.chain.slice(1, self.chain.length + 1);
 
-                    if (blockData && blockData.owner === address) {
-                        starsAcc.push(blockData.star);
-                        return starsAcc;
-                    }
-                }, [])
+            for (const block of blocks) {
+                const blockData = await block.getBData();
+
+                if (blockData && blockData.owner === address) {
+                    stars.push(blockData);
+                }
+            }
 
             resolve(stars);
         });

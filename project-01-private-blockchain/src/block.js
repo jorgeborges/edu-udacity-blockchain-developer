@@ -72,9 +72,10 @@ class Block {
             // Resolve with the data if the object isn't the Genesis block
             if (parsedData && self.height !== 0) {
                 resolve(parsedData);
+            } else {
+                console.error({ parsedData })
+                reject(Error('Could not retrieve data or Genesis Block'));
             }
-
-            reject(Error('Could not retrieve data or Genesis Block'));
         });
     }
 
