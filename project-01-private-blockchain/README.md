@@ -1,5 +1,14 @@
 # Private Blockchain Application
 
+## Setup
+
+To run in your local using docker
+```
+docker run -it --rm --name private-blockchain-service -p 8000:8000 -v "$PWD":/app -w /app node:8.16.0 node app.js
+```
+
+## Project description
+
 You are starting your journey as a Blockchain Developer, this project allows you to demonstrate
 that you are familiarized with the fundamentals concepts of a Blockchain platform.
 Concepts like:
