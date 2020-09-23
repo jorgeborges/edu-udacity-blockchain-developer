@@ -15,7 +15,6 @@ const bodyParser = require("body-parser");
 const BlockChain = require('./src/blockchain.js');
 
 class ApplicationServer {
-
 	constructor() {
 		//Express application object
 		this.app = express();
@@ -46,12 +45,27 @@ class ApplicationServer {
 	}
 
 	start() {
-		let self = this;
-		this.app.listen(this.app.get("port"), () => {
+		const self = this;
+		this.server = this.app.listen(this.app.get("port"), () => {
 			console.log(`Server Listening for port: ${self.app.get("port")}`);
 		});
+
+		process.on("SIGTERM", self.shutdown.bind(self));
+		process.on("SIGINT", self.shutdown.bind(self));
 	}
 
+	shutdown(server) {
+		console.log("Received kill signal, shutting down gracefully");
+		this.server.close(() => {
+			console.log("Closed out remaining connections");
+			process.exit(0);
+		});
+
+		setTimeout(() => {
+			console.error("Could not close connections in time, forcefully shutting down");
+			process.exit(1);
+		}, 10000);
+	}
 }
 
 new ApplicationServer();
