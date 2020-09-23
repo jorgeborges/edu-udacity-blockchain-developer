@@ -36,16 +36,17 @@ class Block {
      *  Note: to access the class values inside a Promise code you need to create an auxiliary value `let self = this;`
      */
     validate() {
-        let self = this;
+        const self = this;
         return new Promise((resolve, reject) => {
             // Save in auxiliary variable the current block hash
-
+            const currentBlockHash = self.hash;
             // Recalculate the hash of the Block
+            const calculatedBlockHash = SHA256(JSON.stringify(self)).toString();
             // Comparing if the hashes changed
+            const isBlockValid = currentBlockHash === calculatedBlockHash;
             // Returning the Block is not valid
-
             // Returning the Block is valid
-
+            resolve(isBlockValid)
         });
     }
 
@@ -59,14 +60,24 @@ class Block {
      *     or Reject with an error.
      */
     getBData() {
-        // Getting the encoded data saved in the Block
-        // Decoding the data to retrieve the JSON representation of the object
-        // Parse the data to an object to be retrieve.
+        const self = this;
 
-        // Resolve with the data if the object isn't the Genesis block
+        return new Promise((resolve, reject) => {
+            // Getting the encoded data saved in the Block
+            const encodedData = self.body;
+            // Decoding the data to retrieve the JSON representation of the object
+            const decodedData = hex2ascii(encodedData);
+            // Parse the data to an object to be retrieve
+            const parsedData = JSON.parse(decodedData);
+            // Resolve with the data if the object isn't the Genesis block
+            if (parsedData && self.height !== 0) {
+                resolve(parsedData);
+            }
 
+            reject(Error('Could not retrieve data or Genesis Block'));
+        });
     }
 
 }
 
-module.exports.Block = Block;                    // Exposing the Block class as a module
+module.exports.Block = Block; // Exposing the Block class as a module
