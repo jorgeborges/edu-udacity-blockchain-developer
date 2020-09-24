@@ -62,23 +62,19 @@ class Block {
      *     or Reject with an error.
      */
     getBData() {
-        const self = this;
+        // Getting the encoded data saved in the Block
+        const encodedData = this.body;
+        // Decoding the data to retrieve the JSON representation of the object
+        const decodedData = hex2ascii(encodedData);
+        // Parse the data to an object to be retrieve
+        const parsedData = JSON.parse(decodedData);
+        // Resolve with the data if the object isn't the Genesis block
+        if (parsedData && this.height !== 0) {
+            return parsedData;
+        }
 
-        return new Promise((resolve, reject) => {
-            // Getting the encoded data saved in the Block
-            const encodedData = self.body;
-            // Decoding the data to retrieve the JSON representation of the object
-            const decodedData = hex2ascii(encodedData);
-            // Parse the data to an object to be retrieve
-            const parsedData = JSON.parse(decodedData);
-            // Resolve with the data if the object isn't the Genesis block
-            if (parsedData && self.height !== 0) {
-                resolve(parsedData);
-            } else {
-                console.error({ parsedData })
-                reject(Error('Could not retrieve data or Genesis Block'));
-            }
-        });
+        console.error({ parsedData })
+        throw Error('Could not retrieve data or attempting to retrieve Genesis Block');
     }
 
 }
