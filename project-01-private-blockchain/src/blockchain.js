@@ -64,16 +64,22 @@ class Blockchain {
     _addBlock(block) {
         let self = this;
         return new Promise(async (resolve, reject) => {
-            if (self.height >= 0) {
-                const latestBlock = self.chain[self.chain.length - 1];
-                block.previousBlockHash = latestBlock.hash;
+            try {
+                if (self.height >= 0) {
+                    const latestBlock = self.chain[self.chain.length - 1];
+                    block.previousBlockHash = latestBlock.hash;
+                }
+
+                block.height = self.height + 1;
+                block.time = new Date().getTime().toString().slice(0, -3);
+                block.hash = SHA256(JSON.stringify(block)).toString();
+                self.chain.push(block);
+                self.height++;
+            } catch (error) {
+                block = null;
             }
 
-            block.height = self.height + 1;
-            block.time = new Date().getTime().toString().slice(0, -3);
-            block.hash = SHA256(JSON.stringify(block)).toString();
-            self.chain.push(block);
-            self.height++;
+            resolve(block);
         });
     }
 
