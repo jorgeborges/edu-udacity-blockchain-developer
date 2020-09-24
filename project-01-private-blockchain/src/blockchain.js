@@ -71,7 +71,7 @@ class Blockchain {
                 }
 
                 block.height = self.height + 1;
-                block.time = new Date().getTime().toString().slice(0, -3);
+                block.time = self._getUnixTimestamp();
                 block.hash = SHA256(JSON.stringify(block)).toString();
                 self.chain.push(block);
                 self.height++;
@@ -92,8 +92,9 @@ class Blockchain {
      * @param {*} address
      */
     requestMessageOwnershipVerification(address) {
+        const self = this;
         return new Promise((resolve) => {
-            resolve(`${address}:${new Date().getTime().toString().slice(0, -3)}:starRegistry`)
+            resolve(`${address}:${self._getUnixTimestamp()}:starRegistry`)
         });
     }
 
@@ -118,7 +119,7 @@ class Blockchain {
         let self = this;
         return new Promise(async (resolve, reject) => {
             const messageTime = parseInt(message.split(':')[1]);
-            const currentTime = parseInt(new Date().getTime().toString().slice(0, -3));
+            const currentTime = self._getUnixTimestamp();
             const isTimeValid = (currentTime - messageTime) < 300;
             let isMessageValid = true;
             let block = null;
@@ -228,6 +229,10 @@ class Blockchain {
 
     _getNoGenesisChain() {
         return this.chain.slice(1, this.chain.length + 1);
+    }
+
+    _getUnixTimestamp() {
+        return Math.floor(Date.now() / 1000);
     }
 }
 
