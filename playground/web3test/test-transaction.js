@@ -3,7 +3,7 @@ const EthereumTransaction = require('ethereumjs-tx');
 require('dotenv').config();
 
 (async () => {
-  const web3 = new Web3('http://127.0.0.1:7545');
+  const web3 = new Web3(process.env.NETWORK_GANACHE_URL);
 
   const sendingAddress = '0x48cccdcef9b1928814a770b56059b5BBEF1D726D';
   const receivingAddress = '0x7e25C8053507beebb9E2418FA44c15655eD7ed53';
@@ -17,7 +17,7 @@ require('dotenv').config();
 
   // Build raw transaction
   const rawTx = {
-    nonce: 5,
+    nonce: 6,
     to: receivingAddress,
     gasPrice: 20000000,
     gasLimit: 30000,
@@ -27,7 +27,7 @@ require('dotenv').config();
 
   // create and sign transaction
   console.log('\nCreating and signing TX...');
-  const privateKeySender = process.env.ETH_ACCOUNT_1_PRIV_KEY;
+  const privateKeySender = process.env.ETH_ACCOUNT_GANACHE_0_PRIV_KEY;
   const privateKeySenderHex = Buffer.from(privateKeySender, 'hex');
   const transaction = new EthereumTransaction.Transaction(rawTx);
   transaction.sign(privateKeySenderHex);
