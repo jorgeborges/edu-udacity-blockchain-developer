@@ -17,13 +17,13 @@ require('dotenv').config();
 
   // Build raw transaction
   const rawTx = {
-    nonce: 3,
+    nonce: 5,
     to: receivingAddress,
     gasPrice: 20000000,
     gasLimit: 30000,
-    value: 1,
+    value: Number(web3.utils.toWei('1', 'ether')),
     data: '0x',
-  }
+  };
 
   // create and sign transaction
   console.log('\nCreating and signing TX...');
